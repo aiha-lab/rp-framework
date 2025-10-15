@@ -22,10 +22,6 @@ docker run -it --rm --gpus all -p 9077:9000 \
     superdocker22/rp_framework:1.0 bash
 ```
 
----
-
-## ⚡ Reduced-Precision Inference (`rp_inference`)
-
 ### ⚠️  Note: Dataset Script Compatibility
 
 #### 1. Dataset Script Compatibility
@@ -42,6 +38,10 @@ After downloading the dataset, reinstall ```datasets==4.1.1``` to ensure compati
 #### 2. Model Path Reminder
 In this README, model paths are written as ```/raid/LLM/...``` for example purposes.  
 Please replace ```/raid/LLM``` with your actual model storage path on your system before running the scripts.
+
+---
+
+## ⚡ Reduced-Precision Inference (`rp_inference`)
 
 ### 🔧 Script Example
 
