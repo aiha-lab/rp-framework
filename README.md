@@ -18,7 +18,7 @@ docker run -it --rm --gpus all -p 9077:9000 \
     -v rp-framework/rp_inference:/root/workspace/rp_inference \
     -v rp-framework/rp_training:/root/workspace/rp_training \
     -v /raid:/raid \
-    superdocker22/rp-framework:1.0 bash
+    superdocker22/rp_framework:1.0 bash
 ```
 
 ---
