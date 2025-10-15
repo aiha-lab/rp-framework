@@ -27,6 +27,8 @@ docker run -it --rm --gpus all -p 9077:9000 \
 ## ⚡ Reduced-Precision Inference (`rp_inference`)
 
 ### ⚠️  Note: Dataset Script Compatibility
+
+#### 1. Dataset Script Compatibility
 If you encounter the following error during dataset generation:
 ```bash
 RuntimeError: Dataset scripts are no longer supported, but found piqa.py
@@ -35,7 +37,11 @@ please downgrade the datasets library to version 3.3.1, as newer versions have r
 ```bash
 pip install datasets==3.3.1
 ```
-After downloading the dataset, reinstall datasets==4.1.1 to ensure compatibility with SFT training.
+After downloading the dataset, reinstall ```datasets==4.1.1``` to ensure compatibility with SFT training.
+
+#### 2. Model Path Reminder
+In this README, model paths are written as ```/raid/LLM/...``` for example purposes.  
+Please replace ```/raid/LLM``` with your actual model storage path on your system before running the scripts.
 
 ### 🔧 Script Example
 
