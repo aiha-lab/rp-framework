@@ -15,8 +15,9 @@ Launch the pre-configured Docker container:
 ```bash
 docker run -it --rm --gpus all -p 9077:9000 \
     --ipc=host \
-    -v rp-framework/rp_inference:/root/workspace/rp_inference \
-    -v rp-framework/rp_training:/root/workspace/rp_training \
+    -v ${PWD}/rp-framework/rp_inference:/root/workspace/rp_inference \
+    -v ${PWD}/rp-framework/rp_training:/root/workspace/rp_training \
+    -v ${PWD}/rp-framework/hf_cache:/root/workspace/hf_cache \
     -v /raid:/raid \
     superdocker22/rp_framework:1.0 bash
 ```
@@ -24,6 +25,17 @@ docker run -it --rm --gpus all -p 9077:9000 \
 ---
 
 ## ⚡ Reduced-Precision Inference (`rp_inference`)
+
+### ⚠️  Note: Dataset Script Compatibility
+If you encounter the following error during dataset generation:
+```bash
+RuntimeError: Dataset scripts are no longer supported, but found piqa.py
+```
+please downgrade the datasets library to version 3.3.1, as newer versions have removed support for script-based dataset loading.
+```bash
+pip install datasets==3.3.1
+```
+After downloading the dataset, reinstall datasets==4.1.1 to ensure compatibility with SFT training.
 
 ### 🔧 Script Example
 
