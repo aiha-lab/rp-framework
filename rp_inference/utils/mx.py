@@ -91,8 +91,8 @@ def get_mx_model(model,
             replace_m=new_m
             wrapped_modules[name] = new_m
             setattr(father_module,name[idx:],replace_m)
-        # Linear
-        elif isinstance(m,nn.Linear) and 'head' not in name:
+        # Linear (Excluding LM Head and High-precision LoRA)
+        elif isinstance(m,nn.Linear) and 'head' not in name and 'lora' not in name:
             idx = idx+1 if idx != 0 else idx
             new_m = Linear(m.in_features,m.out_features,m.bias is not None,mx_specs=mx_specs_linear, args=args)
             new_m.weight.data=m.weight.data

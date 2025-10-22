@@ -1,69 +1,47 @@
 export HF_HOME=~/workspace/hf_cache
 
-model=/raid/LLM/llama3.1-1b-instruct
+model=$2
 seed=0
 tasks=mmlu
 num_fewshot=none
 eval_ppl=false
 
-w_elem_format_linear=none
-a_elem_format_linear=none
-scale_bits_linear=8
-block_size_linear=32
-
-A_elem_format_matmul=none
-B_elem_format_matmul=none
-scale_bits_matmul=8
-block_size_matmul=32
-
-w_elem_format_ln=none
-a_elem_format_ln=none
-scale_bits_ln=8
-block_size_ln=32
-
-w_elem_format_head=none
-a_elem_format_head=none
-scale_bits_head=8
-block_size_head=32
-
 auto_dtype=true
 custom_cuda=true
-a_scale_mode=0
-w_scale_mode=0 
-A_scale_mode=0 
-B_scale_mode=0 
-per_tensor=false
-
+per_tensor=false # per-tensor quantization
 quarot=false
 rotate_mode=hadamard
 rotate_kv=false
 kv_quant_only=false
 kv_tokenwise=false
 
-for model in $2
-do
-for scale_bits in 8
-do
-scale_bits_linear=$scale_bits
-scale_bits_matmul=$scale_bits
-for per_tensor in false
-do
-for block_size in 32
-do
-block_size_linear=$block_size
-block_size_matmul=$block_size
-for format in none
-do
-w_elem_format_linear=$format
-A_elem_format_matmul=$format
-a_elem_format_linear=$format
-B_elem_format_matmul=$format
-for scale_mode in 0
-do
-w_scale_mode=$scale_mode
-A_scale_mode=$scale_mode
-a_scale_mode=$scale_mode
-B_scale_mode=$scale_mode
+# Linear precision
+w_elem_format_linear=fp4_e2m1 # set none for bf16 baseline
+a_elem_format_linear=none
+block_size_linear=32
+scale_bits_linear=8
+w_scale_mode=0 # 0:PoT(Floor), 3: PoT(Round), 152: E5M2
+a_scale_mode=0
+
+# Attention Matmul
+A_elem_format_matmul=none
+B_elem_format_matmul=none
+scale_bits_matmul=8
+block_size_matmul=32
+A_scale_mode=0
+B_scale_mode=0
+
+# LN (Not implemented)
+w_elem_format_ln=none
+a_elem_format_ln=none
+scale_bits_ln=8
+block_size_ln=32
+
+# Head
+w_elem_format_head=none
+a_elem_format_head=none
+scale_bits_head=8
+block_size_head=32
 
 CUDA_VISIBLE_DEVICES=$1 python main.py \
     --model=$model \
@@ -99,9 +77,3 @@ CUDA_VISIBLE_DEVICES=$1 python main.py \
     --rotate_kv=$rotate_kv \
     --kv_quant_only=$kv_quant_only \
     --kv_tokenwise=$kv_tokenwise
-done
-done
-done
-done
-done
-done

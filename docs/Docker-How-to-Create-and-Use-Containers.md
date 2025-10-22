@@ -23,8 +23,8 @@ RUN pip install transformers accelerate sentencepiece tokenizers texttable toml 
 RUN pip install matplotlib scikit-learn pandas
 
 # vimrc               
-RUN echo "abbr import pdb; pdb.set_trace() import pdb; pdb.set_trace()" >> ~/.vimrc
-RUN echo "abbr #============================ #============================ <Esc>i" >> ~/.vimrc
+RUN echo "abbr set_pdb import pdb; pdb.set_trace()" >> ~/.vimrc
+RUN echo "abbr cmt #============================ <Esc>i" >> ~/.vimrc
 
 # Jupyter notebook
 RUN pip install jupyter
