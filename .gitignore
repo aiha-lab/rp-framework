@@ -1,3 +1,5 @@
 *.swp
 __pycache__/
-dataset/alpaca-gpt4*
+*.arrow
+*.jsonl
+*.pt

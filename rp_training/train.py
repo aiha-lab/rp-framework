@@ -47,9 +47,10 @@ from trl import (
     SFTConfig,
     SFTTrainer,
     TrlParser,
+    get_peft_config,
 )
 from utils import (
-    get_peft_config_for_moe,
+    #get_peft_config_for_moe,
     is_distributed_job,
     load_dataset_from_hub_or_local,
 )
@@ -98,7 +99,7 @@ def main(script_args, training_args, model_args, quant_args):
         if training_args.eval_strategy != "no"
         else None,
         processing_class=tokenizer,
-        peft_config=get_peft_config_for_moe(model, model_args),
+        peft_config=get_peft_config(model_args),
     )
 
     trainer.train()

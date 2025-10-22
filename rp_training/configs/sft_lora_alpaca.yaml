@@ -1,0 +1,41 @@
+# Model
+model_name_or_path: /raid/LLM/llama2-7b
+attn_implementation: eager
+torch_dtype: bfloat16
+
+# Dataset
+dataset_name: dataset/alpaca-gpt4-nomask-train-llama2 # LISA paper doesn't mention about completion mask
+dataset_num_proc: 12
+# Bit-precision (Linear)
+w_format: null
+a_format: null
+g_format: null
+
+# Hyperparameters 
+learning_rate: 5.0e-5 # (from LISA paper Table 15)
+gradient_checkpointing: true
+num_train_epochs: 1.0
+logging_steps: 1
+per_device_train_batch_size: 2
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 2
+max_length: 2048
+warmup_ratio: 0.03
+lr_scheduler_type: cosine_with_min_lr
+lr_scheduler_kwargs:
+  min_lr_rate: 0.1
+output_dir: /raid/LLM/llama2-7b-alpaca-gpt4-nomask-lora128
+report_to: []
+seed: 42
+eval_on_start: false
+eval_strategy: steps
+eval_steps: 10000
+save_strategy: "no" # no checkpoint
+dataset_test_split: test
+
+# PEFT (from LISA paper Table 15)
+use_peft: true
+lora_r: 128
+lora_alpha: 128
+lora_dropout: 0.0
+lora_target_modules: all-linear
