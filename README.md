@@ -22,6 +22,12 @@ docker run -it --rm --gpus all -p 9077:9000 \
     superdocker22/rp_framework:1.0 bash
 ```
 
+or, PyTorch 2.6 + CUDA 12.4
+```
+cd rp_inference && bash setup.sh
+cd rp_training && pip install -r requirements.txt
+```
+
 ### ⚠️  Note: Dataset Script Compatibility
 
 #### 1. Dataset Script Compatibility
