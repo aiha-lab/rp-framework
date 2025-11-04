@@ -8,7 +8,7 @@ This repository provides a unified framework for **Reduced-Precision Inference**
 
 ```bash
 git clone https://github.com/aiha-lab/rp-framework.git
-cd rp-framework && git submodule update --init --recursive
+cd rp-framework && git submodule update --init --recursive && cd ..
 ```
 
 Launch the pre-configured Docker container:
@@ -19,13 +19,13 @@ docker run -it --rm --gpus all -p 9077:9000 \
     -v ${PWD}/rp-framework:/rp-framework \
     -v ${PWD}/rp-framework/hf_cache:/rp-framework/hf_cache \
     -v /raid:/raid \
-    superdocker22/rp_framework:1.0 bash
+    superdocker22/rp_framework:1.0 bash # or use your own Docker image with PyTorch 2.6 + CUDA 12.4 (or a similar version)
 ```
 
 or, PyTorch 2.6 + CUDA 12.4
 ```
-cd rp_inference && bash setup.sh
-cd rp_training && pip install -r requirements.txt
+cd /rp-framework/rp_inference && bash setup.sh
+cd /rp-framework/rp_training && pip install -r requirements.txt
 ```
 
 For models like LLaMA that require a Hugging Face access token, run the following command to authenticate:
