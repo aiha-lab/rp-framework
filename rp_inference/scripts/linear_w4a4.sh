@@ -2,7 +2,7 @@ export HF_DATASETS_TRUST_REMOTE_CODE=1
 
 model=$2
 seed=0
-tasks=piqa
+tasks=mmlu
 num_fewshot=none
 eval_ppl=false
 
