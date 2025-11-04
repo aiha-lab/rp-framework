@@ -3,7 +3,7 @@
 ## Preparing Dataset
 
 ```bash
-cd /rp_framework/rp_training/dataset && python gen_alpaca_dataset.py
+cd /rp-framework/rp_training/dataset && python gen_alpaca_dataset.py
 ```
 
 ### gen_alpaca_dataset.py
@@ -37,10 +37,10 @@ def convert_to_language_modeling(example):
 
 ```bash
 # Alpaca-GPT4 Fine-tuning
-cd /rp_framework/rp_training && bash scripts/llama2-alpaca-gpt-sft-r128.sh  # Takes about 2 hours on four A6000-48GB GPUs
+cd /rp-framework/rp_training && bash scripts/llama2-alpaca-gpt-sft-r128.sh  # Takes about 2 hours on four A6000-48GB GPUs
 
 # W4A16 Model + Alpaca-GPT4 Fine-tuning (QLoRA-like)
-cd /rp_framework/rp_training && bash scripts/llama2-w4a16-alpaca-gpt-sft-r128.sh
+cd /rp-framework/rp_training && bash scripts/llama2-w4a16-alpaca-gpt-sft-r128.sh
 ```
 
 ## Inference (MMLU Score)
@@ -48,16 +48,16 @@ cd /rp_framework/rp_training && bash scripts/llama2-w4a16-alpaca-gpt-sft-r128.sh
 ```bash
 # Note: Ensure that "tasks=mmlu" is set in the script.
 # Baseline (approx. 50 mins on A6000-48GB single GPU; 1.5 hours for quantized model)
-cd /rp_framework/rp_inference && bash scripts/run.sh 0 meta-llama/Llama-2-7b
+cd /rp-framework/rp_inference && bash scripts/run.sh 0 meta-llama/Llama-2-7b
 
 # Alpaca-GPT4 Fine-tuned
-cd /rp_framework/rp_inference && bash scripts/run.sh 0 /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128
+cd /rp-framework/rp_inference && bash scripts/run.sh 0 /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128
 
 # W4A16 (MXFP4)
-cd /rp_framework/rp_inference && bash scripts/linear_w4a16.sh 0 meta-llama/Llama-2-7b
+cd /rp-framework/rp_inference && bash scripts/linear_w4a16.sh 0 meta-llama/Llama-2-7b
 
 # W4A16 (MXFP4) + Alpaca-GPT4 Fine-tuned
-cd /rp_framework/rp_inference && bash scripts/linear_w4a16.sh 0 /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128
+cd /rp-framework/rp_inference && bash scripts/linear_w4a16.sh 0 /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128
 ```
 
 ## Results
