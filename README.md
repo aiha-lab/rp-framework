@@ -8,6 +8,7 @@ This repository provides a unified framework for **Reduced-Precision Inference**
 
 ```bash
 git clone https://github.com/aiha-lab/rp-framework.git
+cd rp-framework && git submodule update --init --recursive
 ```
 
 Launch the pre-configured Docker container:
@@ -26,6 +27,11 @@ or, PyTorch 2.6 + CUDA 12.4
 ```
 cd rp_inference && bash setup.sh
 cd rp_training && pip install -r requirements.txt
+```
+
+For models like LLaMA that require a Hugging Face access token, run the following command to authenticate:
+```bash
+hf auth login
 ```
 
 ### ⚠️  Note: Dataset Script Compatibility
@@ -73,15 +79,15 @@ a_scale_mode=0
 cd /root/workspace/rp_inference
 
 # (1) Baseline inference (no quantization)
-bash scripts/run.sh 0 /raid/LLM/llama3.2-1b-instruct
+bash scripts/run.sh 0 meta-llama/Llama-3.2-1B-Instruct
 # Expected accuracy: ~73.94 on PIQA
 
 # (2) W4A4 inference (PTQ)
-bash scripts/linear_w4a4.sh 0 /raid/LLM/llama3.2-1b-instruct
+bash scripts/linear_w4a4.sh 0 meta-llama/Llama-3.2-1B-Instruct
 # Expected accuracy: ~69.37 on PIQA
 
 # (3) Optional: Multi-GPU inference for larger models
-bash scripts/linear_w4a4.sh 0,1,2,3 /raid/LLM/llama3.2-1b-instruct
+bash scripts/linear_w4a4.sh 0,1,2,3 meta-llama/Llama-3.2-1B-Instruct
 ```
 
 ---
@@ -119,7 +125,7 @@ from datasets import load_dataset, DatasetDict
 import transformers
 from transformers import AddedToken
 
-tokenizer = transformers.AutoTokenizer.from_pretrained('/raid/LLM/llama3.2-1b-instruct')
+tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Llama-3.2-1B-Instruct')
 
 def convert_to_language_modeling(example):
     goal, sol1, sol2, label = example["goal"], example["sol1"], example["sol2"], example["label"]
@@ -151,7 +157,7 @@ accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft
 
 ### Example: `configs/sft_full.yaml`
 ```yaml
-model_name_or_path: /raid/LLM/llama3.2-1b-instruct
+model_name_or_path: meta-llama/Llama-3.2-1B-Instruct
 attn_implementation: eager
 torch_dtype: bfloat16
 
@@ -172,7 +178,7 @@ warmup_ratio: 0.03
 lr_scheduler_type: cosine_with_min_lr
 lr_scheduler_kwargs:
   min_lr_rate: 0.1
-output_dir: /raid/LLM/llama3.2-1b-instruct-sft
+output_dir: ./llama3.2-1b-instruct-sft
 report_to: wandb
 ```
 
@@ -180,7 +186,7 @@ report_to: wandb
 
 ```bash
 cd /root/workspace/rp_inference
-bash scripts/linear_w4a4.sh 0 /raid/LLM/llama3.2-1b-instruct-sft
+bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft
 # Expected accuracy: ~75.24 (improved after SFT)
 ```
 
@@ -195,21 +201,21 @@ accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft
 
 ### Example: `configs/sft_qat.yaml`
 ```yaml
-model_name_or_path: /raid/LLM/llama3.2-1b-instruct-sft
+model_name_or_path: ./llama3.2-1b-instruct-sft
 
 # Bit precision (Linear layers)
 w_format: fp4_e2m1
 a_format: fp4_e2m1
 g_format: null
 
-output_dir: /raid/LLM/llama3.2-1b-instruct-sft-qat-w4a4
+output_dir: ./llama3.2-1b-instruct-sft-qat-w4a4
 ```
 
 ### Evaluate QAT-trained Model
 
 ```bash
 cd /root/workspace/rp_inference
-bash scripts/linear_w4a4.sh 0 /raid/LLM/llama3.2-1b-instruct-sft-qat-w4a4
+bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft-qat-w4a4
 # Expected accuracy: ~73.61 (close to BF16 baseline)
 ```
 
@@ -219,8 +225,8 @@ bash scripts/linear_w4a4.sh 0 /raid/LLM/llama3.2-1b-instruct-sft-qat-w4a4
 
 | Stage | Model Path | Expected Accuracy | Description |
 |-------|-------------|------------------|--------------|
-| Baseline (BF16) | `/raid/LLM/llama3.2-1b-instruct` | 73.94 | No quantization |
-| W4A4 PTQ | `/raid/LLM/llama3.2-1b-instruct` | 69.37 | Post-training quantization |
-| SFT | `/raid/LLM/llama3.2-1b-instruct-sft` | 75.24 | Fine-tuned with PIQA |
-| QAT (W4A4) | `/raid/LLM/llama3.2-1b-instruct-sft-qat-w4a4` | 73.61 | Quantization-aware training |
+| Baseline (BF16) | `meta-llama/Llama-3.2-1B-Instruct` | 73.94 | No quantization |
+| W4A4 PTQ | `meta-llama/Llama-3.2-1B-Instruct` | 69.37 | Post-training quantization |
+| SFT | `./llama3.2-1b-instruct-sft` | 75.24 | Fine-tuned with PIQA |
+| QAT (W4A4) | `./llama3.2-1b-instruct-sft-qat-w4a4` | 73.61 | Quantization-aware training |
 
