@@ -16,9 +16,8 @@ Launch the pre-configured Docker container:
 ```bash
 docker run -it --rm --gpus all -p 9077:9000 \
     --ipc=host \
-    -v ${PWD}/rp-framework/rp_inference:/root/workspace/rp_inference \
-    -v ${PWD}/rp-framework/rp_training:/root/workspace/rp_training \
-    -v ${PWD}/rp-framework/hf_cache:/root/workspace/hf_cache \
+    -v ${PWD}/rp-framework:/rp-framework \
+    -v ${PWD}/rp-framework/hf_cache:/rp-framework/hf_cache \
     -v /raid:/raid \
     superdocker22/rp_framework:1.0 bash
 ```
