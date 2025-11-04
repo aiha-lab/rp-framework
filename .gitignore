@@ -4,3 +4,4 @@ __pycache__/
 *.jsonl
 *.pt
 hf_cache/
+model_zoo/
