@@ -146,7 +146,7 @@ DatasetDict({"train": converted_train}).save_to_disk("piqa-train-llama3.2")
 
 ```bash
 cd /rp-framework/rp_training
-accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_full.yaml
+accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_full.yaml --model_name_or_path meta-llama/Llama-3.2-1B-Instruct --output_dir /rp-framework/model_zoo/llama3.2-1b-instruct-sft
 ```
 
 ### Example: `configs/sft_full.yaml`
