@@ -172,7 +172,7 @@ warmup_ratio: 0.03
 lr_scheduler_type: cosine_with_min_lr
 lr_scheduler_kwargs:
   min_lr_rate: 0.1
-output_dir: ./llama3.2-1b-instruct-sft
+output_dir:
 report_to: wandb
 ```
 
@@ -180,7 +180,7 @@ report_to: wandb
 
 ```bash
 cd /rp-framework/rp_inference
-bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft
+bash scripts/linear_w4a4.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft
 # Expected accuracy: ~75.24 (improved after SFT)
 ```
 
@@ -190,26 +190,24 @@ bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft
 
 ```bash
 cd /rp-framework/rp_training
-accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_qat.yaml
+accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_qat.yaml --model_name_or_path /rp-framework/model_zoo/llama3.2-1b-instruct-sft --output_dir /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
 ```
 
 ### Example: `configs/sft_qat.yaml`
 ```yaml
-model_name_or_path: ./llama3.2-1b-instruct-sft
+model_name_or_path: /rp-framework/model_zoo/llama3.2-1b-instruct-sft
 
 # Bit precision (Linear layers)
 w_format: fp4_e2m1
 a_format: fp4_e2m1
 g_format: null
-
-output_dir: ./llama3.2-1b-instruct-sft-qat-w4a4
 ```
 
 ### Evaluate QAT-trained Model
 
 ```bash
 cd /rp-framework/rp_inference
-bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft-qat-w4a4
+bash scripts/linear_w4a4.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
 # Expected accuracy: ~73.61 (close to BF16 baseline)
 ```
 

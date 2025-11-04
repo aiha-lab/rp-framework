@@ -1,4 +1,5 @@
-export HF_HOME=~/workspace/hf_cache
+export HF_HOME=/rp-framework/hf_cache
+export HF_DATASETS_TRUST_REMOTE_CODE=1
 
 model=/raid/LLM/llama3.1-1b-instruct
 seed=0
