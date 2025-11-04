@@ -1,4 +1,3 @@
-export HF_HOME=/rp-framework/hf_cache
 export HF_DATASETS_TRUST_REMOTE_CODE=1
 
 model=$2

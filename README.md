@@ -108,13 +108,13 @@ report_to: wandb
 If the dataset already exists, you can skip this step.
 
 ```bash
-cd /rp-framework/rp_training/datasets
+cd /rp-framework/rp_training/dataset
 python gen_piqa_dataset.py
 # The folder "piqa-train-llama3.2" will be created in the current directory
 ```
 
 ```python
-# rp_training/datasets/gen_piqa_dataset.py
+# rp_training/dataset/gen_piqa_dataset.py
 from datasets import load_dataset, DatasetDict
 import transformers
 from transformers import AddedToken
