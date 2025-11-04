@@ -28,9 +28,9 @@ cd /rp-framework/rp_inference && bash setup.sh
 cd /rp-framework/rp_training && pip install -r requirements.txt
 ```
 
-For models like LLaMA that require a Hugging Face access token, run the following command to authenticate:
+For models like LLaMA that require a Hugging Face access token, run the following command to authenticate (for the first model download):
 ```bash
-hf auth login
+HF_TOKEN=[YOUR_TOKEN] bash scripts/run.sh 0 meta-llama/Llama-3.2-1B-Instruct
 ```
 
 ### ⚠️  Note: Dataset Script Compatibility

@@ -2,7 +2,7 @@ export HF_HOME=~/workspace/hf_cache
 
 model=$2
 seed=0
-tasks=mmlu
+tasks=piqa
 num_fewshot=none
 eval_ppl=false
 
