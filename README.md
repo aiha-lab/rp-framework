@@ -35,7 +35,6 @@ hf auth login
 
 ### ⚠️  Note: Dataset Script Compatibility
 
-#### 1. Dataset Script Compatibility
 If you encounter the following error during dataset generation:
 ```bash
 RuntimeError: Dataset scripts are no longer supported, but found piqa.py
@@ -45,10 +44,6 @@ please downgrade the datasets library to version 3.3.1, as newer versions have r
 pip install datasets==3.3.1
 ```
 After downloading the dataset, reinstall ```datasets==4.1.1``` to ensure compatibility with SFT training.
-
-#### 2. Model Path Reminder
-In this README, model paths are written as ```/raid/LLM/...``` for example purposes.  
-Please replace ```/raid/LLM``` with your actual model storage path on your system before running the scripts.
 
 ---
 
@@ -75,7 +70,7 @@ a_scale_mode=0
 ### ▶️ Usage
 
 ```bash
-cd /root/workspace/rp_inference
+cd /rp-framework/rp_inference
 
 # (1) Baseline inference (no quantization)
 bash scripts/run.sh 0 meta-llama/Llama-3.2-1B-Instruct
@@ -113,7 +108,7 @@ report_to: wandb
 If the dataset already exists, you can skip this step.
 
 ```bash
-cd /root/workspace/rp_training/datasets
+cd /rp-framework/rp_training/datasets
 python gen_piqa_dataset.py
 # The folder "piqa-train-llama3.2" will be created in the current directory
 ```
@@ -150,7 +145,7 @@ DatasetDict({"train": converted_train}).save_to_disk("piqa-train-llama3.2")
 ## 🏋️ Step 1. Supervised Fine-Tuning (SFT)
 
 ```bash
-cd /root/workspace/rp_training
+cd /rp-framework/rp_training
 accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_full.yaml
 ```
 
@@ -184,7 +179,7 @@ report_to: wandb
 ### Evaluate SFT-trained Model
 
 ```bash
-cd /root/workspace/rp_inference
+cd /rp-framework/rp_inference
 bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft
 # Expected accuracy: ~75.24 (improved after SFT)
 ```
@@ -194,7 +189,7 @@ bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft
 ## 🔩 Step 2. Quantization-Aware Training (QAT)
 
 ```bash
-cd /root/workspace/rp_training
+cd /rp-framework/rp_training
 accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_qat.yaml
 ```
 
@@ -213,7 +208,7 @@ output_dir: ./llama3.2-1b-instruct-sft-qat-w4a4
 ### Evaluate QAT-trained Model
 
 ```bash
-cd /root/workspace/rp_inference
+cd /rp-framework/rp_inference
 bash scripts/linear_w4a4.sh 0 ./llama3.2-1b-instruct-sft-qat-w4a4
 # Expected accuracy: ~73.61 (close to BF16 baseline)
 ```

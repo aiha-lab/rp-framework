@@ -1,5 +1,5 @@
 # Model
-model_name_or_path: /raid/LLM/llama3.2-1b-instruct-sft
+model_name_or_path:
 attn_implementation: eager
 torch_dtype: bfloat16
 
@@ -25,7 +25,7 @@ warmup_ratio: 0.03
 lr_scheduler_type: cosine_with_min_lr
 lr_scheduler_kwargs:
   min_lr_rate: 0.1
-output_dir: /raid/LLM/llama3.2-1b-instruct-sft-qat-w4a4
+output_dir:
 report_to: []
 seed: 42
 eval_on_start: false

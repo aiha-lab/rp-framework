@@ -3,7 +3,7 @@ import transformers
 import os
 from transformers import AddedToken
 
-tokenizer = transformers.AutoTokenizer.from_pretrained('/raid/LLM/llama3.2-1b-instruct') # Need to fixed
+tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Llama-3.2-1B-Instruct') # Need to fixed
 
 def convert_to_language_modeling(example):
     goal = example["goal"]
