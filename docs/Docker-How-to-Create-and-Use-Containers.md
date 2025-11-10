@@ -87,7 +87,7 @@ docker build . --tag mydocker:1.0
 Now that the image is built, you can launch a container interactively:
 
 ```bash
-docker run -it --rm --gpus all     -p 9012:9000     --ipc=host     -v /home/hwanii/workspace/mx-lrm:/root/mx-lrm     -v /raid:/raid     mydocker:1.0 bash
+docker run -it --rm --gpus all     -p 9012:9000     --ipc=host     -v /home/user/workspace/mx-lrm:/root/mx-lrm     -v /raid:/raid     mydocker:1.0 bash
 ```
 
 **Explanation of options:**
@@ -100,12 +100,37 @@ docker run -it --rm --gpus all     -p 9012:9000     --ipc=host     -v /home/hwan
 - `-v [host_path]:[container_path]` → Mounts a local directory into the container. Changes are reflected both ways.
 
 Example:
-- `/home/hwanii/workspace/mx-lrm` → Mounted at `/root/mx-lrm`  
+- `/home/user/workspace/mx-lrm` → Mounted at `/root/mx-lrm`  
 - `/raid` → Mounted directly at `/raid`
 
 **Tip:**  
 The container runs in an isolated environment — any changes not saved in a mounted directory will be lost once the container stops.  
 Therefore, mounting key directories with `-v` is strongly recommended.
+
+---
+
+## 4.1 Saving Your Container as a New Image (`docker commit`)
+
+Sometimes, after launching a container, you may install additional packages, change configurations, or update code inside it.  
+If you want to **save the current container state as a new reusable image**, use the `docker commit` command.
+
+```bash
+docker ps
+```
+→ Find the **CONTAINER ID** of the running container you want to save.
+
+Then run:
+```bash
+docker commit [CONTAINER_ID] mydocker:updated
+```
+
+**Explanation:**
+- `docker commit` creates a new image from your current container.
+- `mydocker:updated` is the name and tag of the new image.
+- After this, you can run a container directly from this updated image:
+  ```bash
+  docker run -it --rm --gpus all -p 9012:9000 --ipc=host -v /home/user/workspace/mx-lrm:/root/mx-lrm -v /raid:/raid mydocker:updated bash
+  ```
 
 ---
 
