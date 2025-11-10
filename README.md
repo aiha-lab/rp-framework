@@ -28,6 +28,8 @@ cd /rp-framework/rp_inference && bash setup.sh
 cd /rp-framework/rp_training && pip install -r requirements.txt
 ```
 
+If you want to save your current environment as a Docker image, refer to [Saving Your Container as a New Image (`docker commit`)](https://github.com/aiha-lab/rp-framework/blob/main/docs/Docker-How-to-Create-and-Use-Containers.md#41-saving-your-container-as-a-new-image-docker-commit).
+
 For models like LLaMA that require a Hugging Face access token, run the following command to authenticate (for the first model download):
 ```bash
 huggingface-cli login
