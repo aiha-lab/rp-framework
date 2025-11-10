@@ -240,7 +240,6 @@ class Linear(torch.nn.Linear):
         super().__init__(in_features, out_features, bias)
         self.args = args
         if self.args.save_stats:
-            self.apply_stats = True
             self.stats_momentum = 0.1
             self.register_backward_hook(self.save_gradient_stats)
             self.register_buffer('stats_output_grad_std', torch.zeros(1))
@@ -294,7 +293,7 @@ class Linear(torch.nn.Linear):
             mx_specs=self.mx_specs,
             name=self.name,
             args=self.args,
-            apply_stats=self.apply_stats,
+            apply_stats=self.args.save_stats,
         )
     
         if stats is not None:
