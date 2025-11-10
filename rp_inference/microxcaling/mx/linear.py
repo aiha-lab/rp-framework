@@ -31,6 +31,7 @@ class LinearFunction(torch.autograd.Function):
         mx_specs=None,
         name=None,
         args=None,
+        apply_stats=None,
     ):
         dtype = input.dtype
         # element-wise quantize for input
@@ -92,10 +93,27 @@ class LinearFunction(torch.autograd.Function):
 
         ctx.mx_specs = get_backwards_mx_specs(mx_specs)
         ctx.name = name
-        return output
+
+        #============================ Statistics
+        if apply_stats:
+            with torch.no_grad():
+                stats = dict()
+                stats['stats_finp_ravg'] = bf_in.mean().item()
+                stats['stats_finp_rstd'] = bf_in.std().item()
+                stats['stats_qinp_ravg'] = qis_input.mean().item()
+                stats['stats_qinp_rstd'] = qis_input.std().item()
+                stats['stats_qterr_inp'] = (bf_in-qis_input).norm().item()
+                stats['stats_fwei_ravg'] = bf_weight.mean().item()
+                stats['stats_fwei_rstd'] = bf_weight.std().item()
+                stats['stats_qwei_ravg'] = qis_weight.mean().item()
+                stats['stats_qwei_rstd'] = qis_weight.std().item()
+                stats['stats_qterr_wei'] = (bf_weight-qis_weight).norm().item()
+        else:
+            stats = None
+        return output, stats
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output, grad_stat):
         # load context
         input, weight = ctx.saved_tensors
 
@@ -191,6 +209,7 @@ def linear(
     mx_specs=None,
     name=None,
     args=None,
+    apply_stats=False,
 ):
     mx_assert_test(mx_specs)
     if mx_specs is None:
@@ -198,7 +217,9 @@ def linear(
 
     mx_specs = apply_mx_specs(mx_specs)
 
-    return LinearFunction.apply(input, weight, bias, mx_specs, name, args)
+    output, stats = LinearFunction.apply(input, weight, bias, mx_specs, name, args, apply_stats)
+
+    return output, stats
 
 
 class Linear(torch.nn.Linear):
@@ -218,6 +239,27 @@ class Linear(torch.nn.Linear):
         self.mx_specs = apply_mx_specs(mx_specs)
         super().__init__(in_features, out_features, bias)
         self.args = args
+        if self.args.save_stats:
+            self.apply_stats = True
+            self.stats_momentum = 0.1
+            self.register_backward_hook(self.save_gradient_stats)
+            self.register_buffer('stats_output_grad_std', torch.zeros(1))
+            self.register_buffer('stats_output_grad_mean', torch.zeros(1))
+            self.register_buffer('stats_finp_ravg', torch.zeros(1))
+            self.register_buffer('stats_finp_rstd', torch.zeros(1))
+            self.register_buffer('stats_qinp_ravg', torch.zeros(1))
+            self.register_buffer('stats_qinp_rstd', torch.zeros(1))
+            self.register_buffer('stats_qterr_inp', torch.zeros(1))
+            self.register_buffer('stats_fwei_ravg', torch.zeros(1))
+            self.register_buffer('stats_fwei_rstd', torch.zeros(1))
+            self.register_buffer('stats_qwei_ravg', torch.zeros(1))
+            self.register_buffer('stats_qwei_rstd', torch.zeros(1))
+            self.register_buffer('stats_qterr_wei', torch.zeros(1))
+
+    def save_gradient_stats(self, module, grad_input, grad_output):
+        with torch.no_grad():
+            self.stats_output_grad_std = grad_output[0].std().data
+            self.stats_output_grad_mean = grad_output[0].mean().data
 
     def apply_mx_specs(self, mx_specs):
         mx_assert_test(mx_specs)
@@ -245,13 +287,19 @@ class Linear(torch.nn.Linear):
                 inputs = (self.had_K.to(inputs.dtype).to(inputs.device) @ inputs.reshape(-1, init_shape[-1]//self.had_dim, self.had_dim)) / math.sqrt(init_shape[-1]//self.had_dim)
             inputs = inputs.reshape(init_shape)
 
-        out = linear(
+        out, stats = linear(
             input=inputs,
             weight=self.weight,
             bias=self.bias,
             mx_specs=self.mx_specs,
             name=self.name,
             args=self.args,
+            apply_stats=self.apply_stats,
         )
+    
+        if stats is not None:
+            momentum = self.stats_momentum
+            for k in stats.keys():
+                self.state_dict()[k].mul_(momentum).add_(stats[k]*(1-momentum))
 
         return out

@@ -73,11 +73,6 @@ def main(script_args, training_args, model_args, quant_args):
         model_kwargs["device_map"] = "auto"
 
     model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, **model_kwargs)
- 
-    if not all(x is None for x in (quant_args.w_format, quant_args.a_format, quant_args.g_format)):
-        # you cannot use Zero-stage-3 with QuantizedLinear
-        # because offloading param is not supported
-        get_mx_model(model, quant_args.w_format, quant_args.a_format, quant_args.g_format)
 
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,
@@ -88,10 +83,26 @@ def main(script_args, training_args, model_args, quant_args):
     # --------------
     dataset = load_dataset_from_hub_or_local(script_args, training_args)
 
+    class TrainerWithStats(SFTTrainer):
+        def training_step(self, model, inputs, num_items_in_batch):
+            mode = "train" if self.model.training else "eval"
+            for name, buffer in model.named_buffers():
+                if 'inv_freq' not in name:
+                    layer, stat_name = name.split('.stats_')
+                    self._metrics[mode][f'stats/{stat_name}/{layer}'].append(buffer.item())
+            return super().training_step(model, inputs, num_items_in_batch)
+ 
+    if not all(x is None for x in (quant_args.w_format, quant_args.a_format, quant_args.g_format)):
+        # you cannot use Zero-stage-3 with QuantizedLinear
+        # because offloading param is not supported
+        get_mx_model(model, quant_args.w_format, quant_args.a_format, quant_args.g_format, quant_args)
+
+    trainer_cls = TrainerWithStats if quant_args.save_stats else SFTTrainer
+
     # -------------
     # Train model
     # -------------
-    trainer = SFTTrainer(
+    trainer = trainer_cls(
         model=model,
         args=training_args,
         train_dataset=dataset[script_args.dataset_train_split],
