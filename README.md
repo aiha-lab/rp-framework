@@ -36,6 +36,34 @@ huggingface-cli login
 # Add token as git credential? (Y/n) n
 ```
 
+### 🪄 (Optional) Logger Setup with Weights & Biases (wandb)
+
+The logger is disabled by default.  
+To enable it, sign up for [wandb](https://wandb.ai), log in, and modify the config file.
+
+```bash
+# Console
+pip install wandb
+wandb login
+
+# In config file
+report_to: wandb
+
+# or, Modifying scripts with --report_to wandb
+
+accelerate launch --config_file configs/zero3.yaml train.py \
+  --gradient_accumulation_steps 1 \
+  --per_device_train_batch_size 1 \
+  --model_name_or_path meta-llama/Llama-2-7b-hf \
+  --w_format fp4_e2m1 \
+  --output_dir /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128 \
+  --save_stats \
+  --report_to wandb \
+  --config configs/sft_lora_alpaca.yaml
+```
+
+Using `--save_stats` enables dumping a richer set of statistics, including the mean and standard deviation of inputs, weights, and gradients.
+
 ### ⚠️  Note: Dataset Script Compatibility
 
 If you encounter the following error during dataset generation:
@@ -90,19 +118,6 @@ bash scripts/linear_w4a4.sh 0,1,2,3 meta-llama/Llama-3.2-1B-Instruct
 ---
 
 ## 🧠 Reduced-Precision Training (`rp_training`)
-
-### 🪄 (Optional) Logger Setup with Weights & Biases (wandb)
-
-The logger is disabled by default.  
-To enable it, sign up for [wandb](https://wandb.ai), log in, and modify the config file.
-
-```bash
-# Console
-wandb login
-
-# In config file
-report_to: wandb
-```
 
 ---
 
