@@ -286,6 +286,7 @@ class Linear(torch.nn.Linear):
                 inputs = (self.had_K.to(inputs.dtype).to(inputs.device) @ inputs.reshape(-1, init_shape[-1]//self.had_dim, self.had_dim)) / math.sqrt(init_shape[-1]//self.had_dim)
             inputs = inputs.reshape(init_shape)
 
+        self.args.save_stats = getattr(self.args, "save_stats", False)
         out, stats = linear(
             input=inputs,
             weight=self.weight,
