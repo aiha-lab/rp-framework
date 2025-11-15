@@ -239,6 +239,7 @@ class Linear(torch.nn.Linear):
         self.mx_specs = apply_mx_specs(mx_specs)
         super().__init__(in_features, out_features, bias)
         self.args = args
+        self.args.save_stats = getattr(self.args, "save_stats", False)
         if self.args.save_stats:
             self.stats_momentum = 0.1
             self.register_backward_hook(self.save_gradient_stats)
@@ -286,7 +287,6 @@ class Linear(torch.nn.Linear):
                 inputs = (self.had_K.to(inputs.dtype).to(inputs.device) @ inputs.reshape(-1, init_shape[-1]//self.had_dim, self.had_dim)) / math.sqrt(init_shape[-1]//self.had_dim)
             inputs = inputs.reshape(init_shape)
 
-        self.args.save_stats = getattr(self.args, "save_stats", False)
         out, stats = linear(
             input=inputs,
             weight=self.weight,
