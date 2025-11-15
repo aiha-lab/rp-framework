@@ -83,7 +83,7 @@ After downloading the dataset, reinstall ```datasets==4.1.1``` to ensure compati
 ### 🔧 Script Example
 
 ```bash
-### scripts/linear_w4a4.sh
+### scripts/linear_w4a4_piqa.sh
 # Task configuration
 tasks=piqa # or winogrande, hellaswag, mmlu, boolq, ...
 num_fewshot=none
@@ -104,15 +104,15 @@ a_scale_mode=0
 cd /rp-framework/rp_inference
 
 # (1) Baseline inference (no quantization)
-bash scripts/run.sh 0 meta-llama/Llama-3.2-1B-Instruct
+bash scripts/run_piqa.sh 0 meta-llama/Llama-3.2-1B-Instruct
 # Expected accuracy: ~73.94 on PIQA
 
 # (2) W4A4 inference (PTQ)
-bash scripts/linear_w4a4.sh 0 meta-llama/Llama-3.2-1B-Instruct
+bash scripts/linear_w4a4_piqa.sh 0 meta-llama/Llama-3.2-1B-Instruct
 # Expected accuracy: ~69.37 on PIQA
 
 # (3) Optional: Multi-GPU inference for larger models
-bash scripts/linear_w4a4.sh 0,1,2,3 meta-llama/Llama-3.2-1B-Instruct
+bash scripts/linear_w4a4_piqa.sh 0,1,2,3 meta-llama/Llama-3.2-1B-Instruct
 ```
 
 ---
@@ -198,7 +198,7 @@ report_to: wandb
 
 ```bash
 cd /rp-framework/rp_inference
-bash scripts/linear_w4a4.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft
+bash scripts/linear_w4a4_piqa.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft
 # Expected accuracy: ~75.24 (improved after SFT)
 ```
 
@@ -225,7 +225,7 @@ g_format: null
 
 ```bash
 cd /rp-framework/rp_inference
-bash scripts/linear_w4a4.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
+bash scripts/linear_w4a4_piqa.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
 # Expected accuracy: ~73.61 (close to BF16 baseline)
 ```
 

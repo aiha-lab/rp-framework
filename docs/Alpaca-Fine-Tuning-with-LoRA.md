@@ -48,16 +48,16 @@ cd /rp-framework/rp_training && bash scripts/llama2-w4a16-alpaca-gpt-sft-r128.sh
 ```bash
 # Note: Ensure that "tasks=mmlu" is set in the script.
 # Baseline (approx. 50 mins on A6000-48GB single GPU; 1.5 hours for quantized model)
-cd /rp-framework/rp_inference && bash scripts/run.sh 0 meta-llama/Llama-2-7b-hf
+cd /rp-framework/rp_inference && bash scripts/run_mmlu.sh 0 meta-llama/Llama-2-7b-hf
 
 # Alpaca-GPT4 Fine-tuned
-cd /rp-framework/rp_inference && bash scripts/run.sh 0 /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128
+cd /rp-framework/rp_inference && bash scripts/run_mmlu.sh 0 /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128
 
 # W4A16 (MXFP4)
-cd /rp-framework/rp_inference && bash scripts/linear_w4a16.sh 0 meta-llama/Llama-2-7b-hf
+cd /rp-framework/rp_inference && bash scripts/linear_w4a16_mmlu.sh 0 meta-llama/Llama-2-7b-hf
 
 # W4A16 (MXFP4) + Alpaca-GPT4 Fine-tuned
-cd /rp-framework/rp_inference && bash scripts/linear_w4a16.sh 0 /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128
+cd /rp-framework/rp_inference && bash scripts/linear_w4a16_mmlu.sh 0 /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128
 ```
 
 ## Results
