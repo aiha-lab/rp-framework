@@ -91,7 +91,6 @@ pip install datasets==3.3.1
 cd /rp-framework && mkdir model_zoo
 ```
 
-1. Llama-3.2-1B-Instruct x PIQA
 1-1. Trans-precision Inference (MXFP4) on PIQA dataset
 ```bash
 # BF16 PIQA inference on llama3.2-1b-instruct. Expected output: 'acc,none': 0.7393906420021763
