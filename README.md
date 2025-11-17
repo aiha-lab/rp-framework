@@ -83,7 +83,7 @@ This tutorial covers:
 - MXFP4 W4A4 PTQ and QAT on Llama-3.2–1B-Instruct using the PIQA dataset
 - MXFP4 W4A16 + BF16 LoRA Fine-tuning (QLoRA-like) on Llama-2-7B using Alpaca dataset (Benchmark: MMLU)
 
-0. Huggingface login (for downloading model) and downgrading datasets version (for PIQA dataset)
+### 0. Huggingface login (for downloading model) and downgrading datasets version (for PIQA dataset)
 ```bash
 huggingface-cli login
 # Add token as git credential? (Y/n) n
@@ -91,7 +91,7 @@ pip install datasets==3.3.1
 cd /rp-framework && mkdir model_zoo
 ```
 
-1-1. Trans-precision Inference (MXFP4) on PIQA dataset
+### 1-1. Trans-precision Inference (MXFP4) on PIQA dataset
 ```bash
 # BF16 PIQA inference on llama3.2-1b-instruct. Expected output: 'acc,none': 0.7393906420021763
 cd /rp-framework/rp_inference && bash scripts/run_piqa.sh 0 meta-llama/Llama-3.2-1B-Instruct
@@ -99,7 +99,7 @@ cd /rp-framework/rp_inference && bash scripts/run_piqa.sh 0 meta-llama/Llama-3.2
 cd /rp-framework/rp_inference && bash scripts/linear_w4a4_piqa.sh 0 meta-llama/Llama-3.2-1B-Instruct
 ```
 
-1-2. Full-precision SFT & MXFP4 W4A4 QAT on PIQA dataset
+### 1-2. Full-precision SFT & MXFP4 W4A4 QAT on PIQA dataset
 ```bash
 # Dataset generation
 cd /rp-framework/rp_training/dataset && python gen_piqa_dataset.py
@@ -111,7 +111,7 @@ cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.ya
 cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.yaml train.py --config configs/sft_qat.yaml --model_name_or_path /rp-framework/model_zoo/llama3.2-1b-instruct-sft --output_dir /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
 ```
 
-1-3. Evaluate SFT & QAT model on PIQA dataset
+### 1-3. Evaluate SFT & QAT model on PIQA dataset
 ```
 # Evaluate Full-precision SFT model. Expected output: 'acc,none': 0.7475516866158868
 cd /rp-framework/rp_inference && bash scripts/run_piqa.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft
@@ -119,7 +119,7 @@ cd /rp-framework/rp_inference && bash scripts/run_piqa.sh 0 /rp-framework/model_
 cd /rp-framework/rp_inference && bash scripts/linear_w4a4_piqa.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft-qat-w4a4
 ```
 
-2-1. LoRA Fine-tuning on Llama2-7B with Alpaca-GPT4 dataset
+### 2-1. LoRA Fine-tuning on Llama2-7B with Alpaca-GPT4 dataset
 ```
 # Generate dataset
 pip install datasets==4.1.1
@@ -128,8 +128,9 @@ cd /rp-framework/rp_training/dataset && python gen_alpaca_dataset.py
 cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.yaml train.py --gradient_accumulation_steps 1 --per_device_train_batch_size 1 --model_name_or_path meta-llama/Llama-2-7b-hf --output_dir /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128 --config configs/sft_lora_alpaca.yaml
 # MXFP4 W4A16 Weight + BF16 LoRA
 cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.yaml train.py --gradient_accumulation_steps 1 --per_device_train_batch_size 1 --model_name_or_path meta-llama/Llama-2-7b-hf --w_format fp4_e2m1 --output_dir /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128 --config configs/sft_lora_alpaca.yaml
+```
 
-2-2. Evaluation on MMLU
+### 2-2. Evaluation on MMLU
 ```bash
 # BF16 MMLU inference on llama2-7b. Expected output: 'mmlu': {'acc,none': 0.4126904999287851, ...
 cd /rp-framework/rp_inference && bash scripts/run_mmlu.sh 0 meta-llama/Llama-2-7b-hf
