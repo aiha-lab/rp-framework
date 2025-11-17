@@ -112,7 +112,7 @@ cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.ya
 ```
 
 ### 1-3. Evaluate SFT & QAT model on PIQA dataset
-```
+```bash
 # Evaluate Full-precision SFT model. Expected output: 'acc,none': 0.7475516866158868
 cd /rp-framework/rp_inference && bash scripts/run_piqa.sh 0 /rp-framework/model_zoo/llama3.2-1b-instruct-sft
 # Evaluate Full-precision SFT + MXFP4 W4A4 QAT model accuracy. Expected output: 'acc,none': 0.7263329706202394
@@ -120,7 +120,7 @@ cd /rp-framework/rp_inference && bash scripts/linear_w4a4_piqa.sh 0 /rp-framewor
 ```
 
 ### 2-1. LoRA Fine-tuning on Llama2-7B with Alpaca-GPT4 dataset
-```
+```bash
 # Generate dataset
 pip install datasets==4.1.1
 cd /rp-framework/rp_training/dataset && python gen_alpaca_dataset.py
