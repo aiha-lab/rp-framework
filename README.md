@@ -124,20 +124,20 @@ cd /rp-framework/rp_inference && bash scripts/linear_w4a4_piqa.sh 0 /rp-framewor
 # Generate dataset
 pip install datasets==4.1.1
 cd /rp-framework/rp_training/dataset && python gen_alpaca_dataset.py
-# BF16 Weight + BF16 LoRA
+# BF16 Weight + BF16 LoRA (taking ~2 hours in A6000x4)
 cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.yaml train.py --gradient_accumulation_steps 1 --per_device_train_batch_size 1 --model_name_or_path meta-llama/Llama-2-7b-hf --output_dir /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128 --config configs/sft_lora_alpaca.yaml
 # MXFP4 W4A16 Weight + BF16 LoRA
 cd /rp-framework/rp_training && accelerate launch --config_file configs/zero3.yaml train.py --gradient_accumulation_steps 1 --per_device_train_batch_size 1 --model_name_or_path meta-llama/Llama-2-7b-hf --w_format fp4_e2m1 --output_dir /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128 --config configs/sft_lora_alpaca.yaml
 
 2-2. Evaluation on MMLU
 ```bash
-# BF16 MMLU inference on llama2-7b. Expected output:
+# BF16 MMLU inference on llama2-7b. Expected output: 'mmlu': {'acc,none': 0.4126904999287851, ...
 cd /rp-framework/rp_inference && bash scripts/run_mmlu.sh 0 meta-llama/Llama-2-7b-hf
-# MXFP4 W4A16 inference. Expected output:
+# MXFP4 W4A16 inference. Expected output: 'mmlu': {'acc,none': 0.36355220054123344, ...
 cd /rp-framework/rp_inference && bash scripts/linear_w4a16_mmlu.sh 0 meta-llama/Llama-2-7b-hf
-# BF16 Weight + BF16 LoRA. Expected output:
+# BF16 Weight + BF16 LoRA. Expected output: 'mmlu': {'acc,none': 0.4223045150263495, ...
 cd /rp-framework/rp_inference && bash scripts/run_mmlu.sh 0 /rp-framework/model_zoo/llama2-7b-alpaca-gpt4-nomask-lora128
-# MXFP4 W4A16 Weight + BF16 LoRA. Expected output:
+# MXFP4 W4A16 Weight + BF16 LoRA. Expected output: 'mmlu': {'acc,none': 0.40008545791197836, ...
 cd /rp-framework/rp_inference && bash scripts/linear_w4a16_mmlu.sh 0 /rp-framework/model_zoo/llama2-7b-mxfp4-w4a16-alpaca-gpt4-nomask-lora128
 ```
 
