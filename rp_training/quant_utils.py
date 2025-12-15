@@ -9,6 +9,7 @@ class QuantizationArguments:
     w_format: str | None = field(default=None, metadata={"help":"MXFP4 supports"})
     a_format: str | None = field(default=None, metadata={"help":"MXFP4 supports"})
     g_format: str | None = field(default=None, metadata={"help":"MXFP4 supports"})
+    quantize_lora: bool = field(default=False, metadata={"help":"Quantized LoRA"})
     save_stats: bool = field(default=False, metadata={"help":"Quantized training stats"})
 
 class TempMxSpecs:
@@ -28,7 +29,7 @@ def get_mx_model(model, w_format, a_format, g_format, args=None):
     mx_specs['w_elem_format_bp'] = g_format
     mx_specs['a_elem_format_bp_ex'] = g_format # activation,gradient in bwd pass
     mx_specs['a_elem_format_bp_os'] = g_format # weight*gradient in bwd pass
-    mx_specs['quantize_backprop'] = False
+    mx_specs['quantize_backprop'] = g_format is not None
     print(mx_specs)
     
     it=[(name,m) for name,m in model.named_modules()]
@@ -49,14 +50,20 @@ def get_mx_model(model, w_format, a_format, g_format, args=None):
             new_m = Linear(m.in_features,m.out_features,m.bias is not None,mx_specs=mx_specs, args=args)
             new_m.weight.data=m.weight.data
             new_m.bias=m.bias
+            new_m.weight.requires_grad = m.weight.requires_grad
+            if m.bias is not None:
+                new_m.bias.requires_grad = m.bias.requires_grad
             replace_m=new_m
             wrapped_modules[name] = new_m
             setattr(father_module,name[idx:],replace_m)
-        elif isinstance(m,nn.Linear) and 'lora' in name:
+        elif isinstance(m,nn.Linear) and 'lora' in name and args.quantize_lora:
             idx = idx+1 if idx != 0 else idx
-            new_m = Linear(m.in_features,m.out_features,m.bias is not None,mx_specs=mx_specs_fp, args=args)
+            new_m = Linear(m.in_features,m.out_features,m.bias is not None,mx_specs=mx_specs, args=args)
             new_m.weight.data=m.weight.data
             new_m.bias=m.bias
+            new_m.weight.requires_grad = m.weight.requires_grad
+            if m.bias is not None:
+                new_m.bias.requires_grad = m.bias.requires_grad
             replace_m=new_m
             wrapped_modules[name] = new_m
             setattr(father_module,name[idx:],replace_m)

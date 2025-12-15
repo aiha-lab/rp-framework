@@ -121,7 +121,7 @@ class LinearFunction(torch.autograd.Function):
         in_dim = weight.shape[1]
 
         grad_output = quantize_elemwise_op(
-            grad_output,
+            grad_output.float(),
             mx_specs=ctx.mx_specs,
             round=ctx.mx_specs["round_grad_input"],
         )

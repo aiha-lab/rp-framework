@@ -3,7 +3,8 @@ import transformers
 import os
 from transformers import AddedToken
 
-tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Llama-2-7b-hf') # Need to fixed
+#tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Llama-2-7b-hf') # Need to fixed
+tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Llama-3.2-1B') # Need to fixed
 
 def convert_to_language_modeling(example):
     system = "Below is an instruction that describes a task. Write a response that appropriately completes the request."
@@ -31,5 +32,5 @@ converted_train = raw_train.map(
     
 converted = DatasetDict({"train": converted_train})
     
-output_dir = "alpaca-gpt4-nomask-train-llama2"
+output_dir = "alpaca-gpt4-nomask-train-llama3.2"
 converted.save_to_disk(output_dir)

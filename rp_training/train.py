@@ -91,11 +91,6 @@ def main(script_args, training_args, model_args, quant_args):
                     layer, stat_name = name.split('.stats_')
                     self._metrics[mode][f'stats/{stat_name}/{layer}'].append(buffer.item())
             return super().training_step(model, inputs, num_items_in_batch)
- 
-    if not all(x is None for x in (quant_args.w_format, quant_args.a_format, quant_args.g_format)):
-        # you cannot use Zero-stage-3 with QuantizedLinear
-        # because offloading param is not supported
-        get_mx_model(model, quant_args.w_format, quant_args.a_format, quant_args.g_format, quant_args)
 
     trainer_cls = TrainerWithStats if quant_args.save_stats else SFTTrainer
 
@@ -112,8 +107,17 @@ def main(script_args, training_args, model_args, quant_args):
         processing_class=tokenizer,
         peft_config=get_peft_config(model_args),
     )
+ 
+    if not all(x is None for x in (quant_args.w_format, quant_args.a_format, quant_args.g_format)):
+        # you cannot use Zero-stage-3 with QuantizedLinear
+        # because offloading param is not supported
+        get_mx_model(trainer.model, quant_args.w_format, quant_args.a_format, quant_args.g_format, quant_args)
+
+    for p, pp in trainer.model.named_parameters():
+        print(f'{p:100s} requires_grad={pp.requires_grad}')
 
     trainer.train()
+
     trainer.save_model(training_args.output_dir)
     if training_args.push_to_hub:
         trainer.push_to_hub(dataset_name=script_args.dataset_name)

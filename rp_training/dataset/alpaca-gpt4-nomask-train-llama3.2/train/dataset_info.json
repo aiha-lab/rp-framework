@@ -1,0 +1,64 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "alpaca-gpt4",
+  "dataset_size": 88566301,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/vicgalle/alpaca-gpt4@f7e3ded725cb81e8e564e32feb12860f376f2b51/data/train-00000-of-00001-6ef3991c06080e14.parquet": {
+      "num_bytes": 48393562,
+      "checksum": null
+    }
+  },
+  "download_size": 48393562,
+  "features": {
+    "instruction": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "input": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "output": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "input_ids": {
+      "feature": {
+        "dtype": "int32",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "completion_mask": {
+      "feature": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "_type": "List"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 136959863,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 88566301,
+      "num_examples": 52002,
+      "dataset_name": "alpaca-gpt4"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}
