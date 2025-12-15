@@ -5,3 +5,4 @@ __pycache__/
 *.pt
 hf_cache/
 model_zoo/
+wandb/

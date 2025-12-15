@@ -39,7 +39,12 @@ accelerate launch \
     --attn_implementation kernels-community/vllm-flash-attn3
 """
 
+import json
+import os
+from datetime import datetime
+
 import torch
+from transformers import TrainerCallback
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import (
     ModelConfig,
@@ -56,6 +61,63 @@ from utils import (
 )
 
 from quant_utils import QuantizationArguments, get_mx_model
+
+
+class JSONStatsCallback(TrainerCallback):
+    """Callback to save custom stats to a JSON file locally."""
+    
+    def __init__(self, output_dir, save_every_n_steps=100):
+        self.output_dir = output_dir
+        self.save_every_n_steps = save_every_n_steps
+        self.stats_history = []
+        self.stats_file = None
+    
+    def on_train_begin(self, args, state, control, **kwargs):
+        os.makedirs(self.output_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.stats_file = os.path.join(self.output_dir, f"stats_{timestamp}.json")
+        # Initialize with metadata
+        self.stats_history = [{
+            "metadata": {
+                "created_at": timestamp,
+                "output_dir": args.output_dir,
+                "num_train_epochs": args.num_train_epochs,
+                "per_device_train_batch_size": args.per_device_train_batch_size,
+            }
+        }]
+    
+    def on_log(self, args, state, control, logs=None, model=None, **kwargs):
+        if logs is None:
+            return
+        
+        # Separate custom stats from default metrics
+        stats_logs = {k: v for k, v in logs.items() if k.startswith("stats/")}
+        default_logs = {k: v for k, v in logs.items() if not k.startswith("stats/")}
+        
+        entry = {
+            "global_step": state.global_step,
+            "epoch": state.epoch,
+            "metrics": default_logs,  # entropy, loss, num_tokens, etc.
+        }
+        if stats_logs:
+            entry["stats"] = stats_logs  # custom quantization stats
+        
+        self.stats_history.append(entry)
+        
+        # Save periodically
+        if state.global_step % self.save_every_n_steps == 0:
+            self._save_to_file()
+    
+    def on_train_end(self, args, state, control, **kwargs):
+        # Final save
+        self._save_to_file()
+        print(f"Stats saved to: {self.stats_file}")
+    
+    def _save_to_file(self):
+        if self.stats_file:
+            with open(self.stats_file, 'w', encoding='utf-8') as f:
+                json.dump(self.stats_history, f, indent=2, ensure_ascii=False)
+
 
 def main(script_args, training_args, model_args, quant_args):
     # ------------------------
@@ -94,6 +156,15 @@ def main(script_args, training_args, model_args, quant_args):
 
     trainer_cls = TrainerWithStats if quant_args.save_stats else SFTTrainer
 
+    # Setup callbacks for JSON stats logging
+    callbacks = []
+    if quant_args.save_stats:
+        stats_dir = os.path.join(training_args.output_dir, "stats")
+        callbacks.append(JSONStatsCallback(
+            output_dir=stats_dir,
+            save_every_n_steps=training_args.logging_steps,
+        ))
+
     # -------------
     # Train model
     # -------------
@@ -106,6 +177,7 @@ def main(script_args, training_args, model_args, quant_args):
         else None,
         processing_class=tokenizer,
         peft_config=get_peft_config(model_args),
+        callbacks=callbacks if callbacks else None,
     )
  
     if not all(x is None for x in (quant_args.w_format, quant_args.a_format, quant_args.g_format)):
@@ -129,3 +201,4 @@ if __name__ == "__main__":
         return_remaining_strings=True
     )
     main(script_args, training_args, model_args, quant_args)
+
